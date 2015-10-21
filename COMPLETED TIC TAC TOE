@@ -1,0 +1,273 @@
+board=[]
+p1 = 0
+p2 = 0
+draw = 0
+turn = 1
+
+def drawBoard(board):
+
+    #New Board, default digits
+    board.insert(0,"1")
+    board.insert(1,"2")
+    board.insert(2,"3")
+    board.insert(3,"4")
+    board.insert(4,"5")
+    board.insert(5,"6")
+    board.insert(6,"7")
+    board.insert(7,"8")
+    board.insert(8,"9")
+    
+    #The board design printed
+    def draw():
+        print('   |   |')
+        print(' ' + board[6] + ' | ' + board[7] + ' | ' + board[8])
+        print('   |   |')
+        print('-----------')
+        print('   |   |')
+        print(' ' + board[3] + ' | ' + board[4] + ' | ' + board[5])
+        print('   |   |')
+        print('-----------')
+        print('   |   |')
+        print(' ' + board[0] + ' | ' + board[1] + ' | ' + board[2])
+        print('   |   |')
+
+
+    #Player 1's turn
+    def p1():
+        a = int(input("\n\n\nPlayer 1: X, Enter number: "))
+        if(a == 1):
+            board[0] = "X"
+            draw()
+            winner()
+            p2()
+        elif(a == 2):
+            board[1] = "X"
+            draw()
+            winner()
+            p2()
+        elif(a == 3):
+            board[2] = "X"
+            draw()
+            winner()
+            p2()
+        elif(a == 4):
+            board[3] = "X"
+            draw()
+            winner()
+            p2()
+        elif(a == 5):
+            board[4] = "X"
+            draw()
+            winner()
+            p2()
+        elif(a == 6):
+            board[5] = "X"
+            draw()
+            winner()
+            p2()
+        elif(a == 7):
+            board[6] = "X"
+            draw()
+            winner()
+            p2()
+        elif(a == 8):
+            board[7] = "X"
+            draw()
+            winner()
+            p2()
+        elif(a == 9):
+            board[8] = "X"
+            draw()
+            winner()
+            p2()
+        else:
+            print("You entered an invalid number. FUCK U!")
+            exit()
+
+    #Player 2's turn
+    def p2():
+        a = int(input("\n\n\nPlayer 2: O, Enter number: "))
+        if(a == 1):
+            board[0] = "O"
+            draw()
+            winner()
+            p1()
+        elif(a == 2):
+            board[1] = "O"
+            draw()
+            winner()
+            p1()
+        elif(a == 3):
+            board[2] = "O"
+            draw()
+            winner()
+            p1()
+        elif(a == 4):
+            board[3] = "O"
+            draw()
+            winner()
+            p1()
+        elif(a == 5):
+            board[4] = "O"
+            draw()
+            winner()
+            p1()
+        elif(a == 6):
+            board[5] = "O"
+            draw()
+            winner()
+            p1()
+        elif(a == 7):
+            board[6] = "O"
+            draw()
+            winner()
+            p1()
+        elif(a == 8):
+            board[7] = "O"
+            draw()
+            winner()
+            p1()
+        elif(a == 9):
+            board[8] = "O"
+            draw()
+            winner()
+            p1()
+        else:
+            print("You entered an invalid number. FUCK U!")
+            exit()
+
+    #Check to see if anyone won
+    def winner():
+
+        global p1
+        global p2
+        global draw
+        
+        #PLAYER 1, X
+        #horizontal
+        if(board[0] == "X" and board[1] == "X" and board[2] == "X"):
+            print("\n\nPLAYER 1 (X) WINS!!!")
+            p1 = p1 + 1
+            print("\nPlayer 1: " + str(p1) + "\nPlayer 2: " + str(p2) + "\nDraw: " + str(draw))
+            repeat()
+        elif(board[3] == "X" and board[4] == "X" and board[5] == "X"):
+            print("\n\nPLAYER 1 (X) WINS!!!")
+            p1 = p1 + 1
+            print("\nPlayer 1: " + str(p1) + "\nPlayer 2: " + str(p2) + "\nDraw: " + str(draw))
+            repeat()
+        elif(board[6] == "X" and board[7] == "X" and board[8] == "X"):
+            print("\n\nPLAYER 1 (X) WINS!!!")
+            p1 = p1 + 1
+            print("\nPlayer 1: " + str(p1) + "\nPlayer 2: " + str(p2) + "\nDraw: " + str(draw))
+            repeat()
+        #vertical
+        elif(board[0] == "X" and board[3] == "X" and board[6] == "X"):
+            print("\n\nPLAYER 1 (X) WINS!!!")
+            p1 = p1 + 1
+            print("\nPlayer 1: " + str(p1) + "\nPlayer 2: " + str(p2) + "\nDraw: " + str(draw))
+            repeat()
+        elif(board[1] == "X" and board[4] == "X" and board[7] == "X"):
+            print("\n\nPLAYER 1 (X) WINS!!!")
+            p1 = p1 + 1
+            print("\nPlayer 1: " + str(p1) + "\nPlayer 2: " + str(p2) + "\nDraw: " + str(draw))
+            repeat()
+        elif(board[2] == "X" and board[5] == "X" and board[8] == "X"):
+            print("\n\nPLAYER 1 (X) WINS!!!")
+            p1 = p1 + 1
+            print("\nPlayer 1: " + str(p1) + "\nPlayer 2: " + str(p2) + "\nDraw: " + str(draw))
+            repeat()
+        #diagonal
+        elif(board[0] == "X" and board[4] == "X" and board[8] == "X"):
+            print("\n\nPLAYER 1 (X) WINS!!!")
+            p1 = p1 + 1
+            print("\nPlayer 1: " + str(p1) + "\nPlayer 2: " + str(p2) + "\nDraw: " + str(draw))
+            repeat()
+        elif(board[2] == "X" and board[4] == "X" and board[6] == "X"):
+            print("\n\nPLAYER 1 (X) WINS!!!")
+            p1 = p1 + 1
+            print("\nPlayer 1: " + str(p1) + "\nPlayer 2: " + str(p2) + "\nDraw: " + str(draw))
+            repeat()
+
+        #PLAYER 2, O
+        #horizontal
+        elif(board[0] == "O" and board[1] == "O" and board[2] == "O"):
+            print("\n\nPLAYER 2 (O) WINS!!!")
+            p2 = p2 + 1
+            print("\nPlayer 1: " + str(p1) + "\nPlayer 2: " + str(p2) + "\nDraw: " + str(draw))
+            repeat()
+        elif(board[3] == "O" and board[4] == "O" and board[5] == "O"):
+            print("\n\nPLAYER 2 (O) WINS!!!")
+            p2 = p2 + 1
+            print("\nPlayer 1: " + str(p1) + "\nPlayer 2: " + str(p2) + "\nDraw: " + str(draw))
+            repeat()
+        elif(board[6] == "O" and board[7] == "O" and board[8] == "O"):
+            print("\n\nPLAYER 2 (O) WINS!!!")
+            p2 = p2 + 1
+            print("\nPlayer 1: " + str(p1) + "\nPlayer 2: " + str(p2) + "\nDraw: " + str(draw))
+            repeat()
+        #vertical
+        elif(board[0] == "O" and board[3] == "O" and board[6] == "O"):
+            print("\n\nPLAYER 2 (O) WINS!!!")
+            p2 = p2 + 1
+            print("\nPlayer 1: " + str(p1) + "\nPlayer 2: " + str(p2) + "\nDraw: " + str(draw))
+            repeat()
+        elif(board[1] == "O" and board[4] == "O" and board[7] == "O"):
+            print("\n\nPLAYER 2 (O) WINS!!!")
+            p2 = p2 + 1
+            print("\nPlayer 1: " + str(p1) + "\nPlayer 2: " + str(p2) + "\nDraw: " + str(draw))
+            repeat()
+        elif(board[2] == "O" and board[5] == "O" and board[8] == "O"):
+            print("\n\nPLAYER 2 (O) WINS!!!")
+            p2 = p2 + 1
+            print("\nPlayer 1: " + str(p1) + "\nPlayer 2: " + str(p2) + "\nDraw: " + str(draw))
+            repeat()
+        #diagonal
+        elif(board[0] == "O" and board[4] == "O" and board[8] == "O"):
+            print("\n\nPLAYER 2 (O) WINS!!!")
+            p2 = p2 + 1
+            print("\nPlayer 1: " + str(p1) + "\nPlayer 2: " + str(p2) + "\nDraw: " + str(draw))
+            repeat()
+        elif(board[2] == "O" and board[4] == "O" and board[6] == "O"):
+            print("\n\nPLAYER 2 (O) WINS!!!")
+            p2 = p2 + 1
+            print("\nPlayer 1: " + str(p1) + "\nPlayer 2: " + str(p2) + "\nDraw: " + str(draw))
+            repeat()
+
+        #DRAW
+        elif( (board[0] == "X" or board[0] == "O")
+                and (board[1] == "X" or board[1] == "O")
+                and (board[2] == "X" or board[2] == "O")
+                and (board[3] == "X" or board[3] == "O")
+                and (board[4] == "X" or board[4] == "O")
+                and (board[5] == "X" or board[5] == "O")
+                and (board[6] == "X" or board[6] == "O")
+                and (board[7] == "X" or board[7] == "O")
+                and (board[8] == "X" or board[8] == "O")):
+                print("\n\nIts a tie.")
+                draw = draw + 1
+                print("\nPlayer 1: " + str(p1) + "\nPlayer 2: " + str(p2) + "\nDraw: " + str(draw))
+                repeat()
+
+    #Do you want to play again?            
+    def repeat():
+
+        global turn
+        
+        a = input("\n\n\nDo you want to play again? (Y/N)")
+        if(a == "y" or a == "Y"):
+            if(turn == 1):
+                turn = 2
+            elif(turn == 2):
+                turn = 1
+            drawBoard(board)
+        else:
+            exit()
+
+
+    #Start by drawing the board
+    draw()
+    if(turn == 1):
+        p1()
+    elif(turn == 2):
+        p2()
+drawBoard(board)
