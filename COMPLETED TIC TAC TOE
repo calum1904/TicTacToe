@@ -6,7 +6,7 @@ draw = 0
 turn = 1
 
 #Main Function (carries everything inside)
-def drawBoard(board):
+def drawBoard():
 
     #New Board, default digits
     board.insert(0,"1")
@@ -290,7 +290,7 @@ def drawBoard(board):
                 turn = 2
             elif(turn == 2):
                 turn = 1
-            drawBoard(board)
+            drawBoard()
         else:
             exit()
 
@@ -304,4 +304,4 @@ def drawBoard(board):
         p2()
 
 #call the main function to start the game
-drawBoard(board)
+drawBoard()
