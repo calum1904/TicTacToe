@@ -25,17 +25,36 @@ def checkWinner():
     else:
         turnP = playersTurn
         playersTurn = "X"
+    print(turnP)
         
     lable.configure(text = "Tic Tac Toe \n it is " + playersTurn + "s go!")
-    
+
+    # check for horizontal wins
     for x in range (0,9,3):
         if (allbuttons[x]["text"] == turnP and allbuttons[x+1]["text"] == turnP and allbuttons[x+2]["text"] == turnP):
             playAgain(turnP)
-    for x in range (0,9,1):
+
+    # check for vertical wins
+    for x in range (0,3,1):
         if (allbuttons[x]["text"] == turnP and allbuttons[x+3]["text"] == turnP and allbuttons[x+6]["text"] == turnP):
             playAgain(turnP)
+
+    # check for diagonal wins    
     if (allbuttons[0]["text"] == turnP and allbuttons[4]["text"] == turnP and allbuttons[8]["text"] == turnP or allbuttons[2]["text"] == turnP and allbuttons[4]["text"] == turnP and allbuttons[6]["text"] == turnP):
             playAgain(turnP)
+            
+    # check for draw
+    elif(1==1):
+        draw = 0
+        for x in range (9):
+            if (allbuttons[x]["text"] == "X" or allbuttons[x]["text"] == "O"):
+                print(draw)
+                draw = draw+1
+
+
+            print('draw %d ' % draw )
+            if draw == 9:
+                playAgain("Draw")
           
 def reset():
     for x in range(0,9):
@@ -43,7 +62,7 @@ def reset():
 
 def playAgain(winner):
     if winner == "X" or winner == "O":
-            playAgainX = tkinter.messagebox.askyesno("WINNER", "The winner is " +winner+ " \n Would you like to play again?")
+            playAgainX = tkinter.messagebox.askyesno("WINNER", "The winner is %s \n Would you like to play again?" %winner)
             if playAgainX is True:
                 reset()
             elif playAgainX is False:
