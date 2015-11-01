@@ -9,74 +9,11 @@ draw = 0
 
 from tkinter import *
 import tkinter.messagebox
+import os
+import sys
 
 
-# ------------------------CREATE BOARD-------------------------------
-tk = Tk()
-tk.title("Tic Tac Toe")
-
-# ---TOP FRAME---
-# top label
-header = Label(tk, text="Tic Tac Toe \n it is " + playersTurn + "s go!")
-header.grid(row=0, column=2)
-
-
-# ---MIDDLE FRAME---
-# This function is used to check wich row each box needs to go in
-def rowChecker():
-    rowX = 1
-    if x == 0 or x == 1 or x == 2:
-        rowX = 1
-    elif x == 3 or x == 4 or x == 5:
-        rowX = 2
-    elif x == 6 or x == 7 or x == 8:
-        rowX = 3
-    return rowX
-
-
-# This creates the board and the buttons and runs the game
-for x in range(0, 9):
-    button = "button" + str(x)
-    coloumnX = 1
-    rowXI = 1
-    if x == 0 or x == 3 or x == 6:
-        columnX = 1
-        rowXI = rowChecker()
-    elif x == 1 or x == 4 or x == 7:
-        columnX = 2
-        rowXI = rowChecker()
-    elif x == 2 or x == 5 or x == 8:
-        columnX = 3
-        rowXI = rowChecker()
-
-    print(x, rowXI, columnX)
-
-    button = Button(tk, text=" ", height=7, width=14, command=lambda j=x: turnChecker(j))
-    button.grid(row=rowXI, column=columnX)
-    allbuttons.append(button)
-
-# ---BOTTOM FRAME---
-scoreboard = Label(tk, text="Scoreboard")
-scoreboard.grid(row=4, column=2)
-
-player1 = Label(tk, text="Player1: %d" %p1)
-player1.grid(row=5,column=1)
-
-player2 = Label(tk, text="Player2: %d" %p2)
-player2.grid(row=5,column=2)
-
-Draws = Label(tk, text="Draws: %d" %draw)
-Draws.grid(row=5,column=3)
-
-# ------------------------END OF CREATE BOARD-------------------------------
-
-
-
-
-
-
-
-# ----------------------------ALL FUNCTIONS---------------------------------
+# --------------------------------ALL FUNCTIONS-----------------------------------------
 
 # Check which players turn it is
 def turnChecker(button):
@@ -90,7 +27,6 @@ def turnChecker(button):
 
 # change turn after every move
 def changeTurn():
-    print(playersTurn)
     global playersTurn
     if playersTurn == "X":
         playersTurn = "O"
@@ -176,8 +112,86 @@ def reset():
         Draws.configure(text="Draws: %d" %draw)
         allbuttons[x]["text"] = " "
 
+def newgame():
+    tk.destroy()
+    import test # replace 'test' with your file name
 
-# ------------------------END ALL FUNCTIONS-------------------------------
+
+# -----------------------------END ALL FUNCTIONS----------------------------------
+
+
+
+
+# ------------------------------CREATE BOARD--------------------------------------
+
+# Create and configure the layout
+tk = Tk()
+tk.title("Tic Tac Toe")
+tk.configure(background='white')
+
+# Menu bar
+menubar = Menu(tk)
+tk.config(menu=menubar)
+
+submenu = Menu(menubar)
+menubar.add_cascade(label="File", menu=submenu)
+submenu.add_command(label="New Game..", command=newgame)
+submenu.add_command(label="Exit", command=tk.destroy)
+
+# ---TOP FRAME---
+# top label
+header = Label(tk, text="Tic Tac Toe \n it is " + playersTurn + "s go!", fg="black", bg="white", font=("Helvetica", 12))
+header.grid(row=0, column=2)
+
+
+# ---MIDDLE FRAME---
+# This function is used to check wich row each box needs to go in
+def rowChecker():
+    rowX = 1
+    if x == 0 or x == 1 or x == 2:
+        rowX = 1
+    elif x == 3 or x == 4 or x == 5:
+        rowX = 2
+    elif x == 6 or x == 7 or x == 8:
+        rowX = 3
+    return rowX
+
+
+# This creates the board and the buttons and runs the game
+for x in range(0, 9):
+    button = "button" + str(x)
+    coloumnX = 1
+    rowXI = 1
+    if x == 0 or x == 3 or x == 6:
+        columnX = 1
+        rowXI = rowChecker()
+    elif x == 1 or x == 4 or x == 7:
+        columnX = 2
+        rowXI = rowChecker()
+    elif x == 2 or x == 5 or x == 8:
+        columnX = 3
+        rowXI = rowChecker()
+
+    print(x, rowXI, columnX)
+
+    button = Button(tk, text=" ", height=7, width=14, command=lambda j=x: turnChecker(j))
+    button.grid(row=rowXI, column=columnX)
+    allbuttons.append(button)
+
+# ---BOTTOM FRAME---
+scoreboard = Label(tk, text="Scoreboard", fg="black", bg="white", font=("Helvetica", 12))
+scoreboard.grid(row=4, column=2)
+
+player1 = Label(tk, text="Player1: %d" %p1, fg="black", bg="white", font=("Helvetica", 12))
+player1.grid(row=5,column=1)
+
+player2 = Label(tk, text="Player2: %d" %p2, fg="black", bg="white", font=("Helvetica", 12))
+player2.grid(row=5,column=2)
+
+Draws = Label(tk, text="Draws: %d" %draw, fg="black", bg="white", font=("Helvetica", 12))
+Draws.grid(row=5,column=3)
+
+# -------------------------------END OF CREATE BOARD------------------------------------
 
 
 # keep program open until user closes
