@@ -196,29 +196,76 @@ def newgame():
     moves2 = [4]
     moves3 = [1,3,5,7]
 
-def whiteTheme():
-    tk.configure(background='white')
-def blackTheme():
-    tk.configure(background='black')
-def blueTheme():
-    tk.configure(background='blue')    
-        
 
 # -----------------------------END ALL FUNCTIONS----------------------------------
-# ------------------------------CREATE BOARD--------------------------------------
 
 # Create and configure the layout
 tk = Tk()
 tk.title("Tic Tac Toe")
 
-#Theme Options
+# ----------------------------------THEMES-------------------------------------------
 def whiteTheme():
     tk.configure(background='white')
+    # ---TOP FRAME---
+    # top label
+    header = Label(tk, text="Tic Tac Toe \n it is " + playersTurn + "s go!", fg="black", bg="white", font=("Helvetica", 12))
+    header.grid(row=0, column=2)
+
+    # ---BOTTOM FRAME---
+    scoreboard = Label(tk, text="Scoreboard", fg="black", bg="white", font=("Helvetica", 12))
+    scoreboard.grid(row=4, column=2)
+
+    player1 = Label(tk, text="Player1: %d" %p1, fg="black", bg="white", font=("Helvetica", 12))
+    player1.grid(row=5,column=1)
+
+    player2 = Label(tk, text="Player2: %d" %p2, fg="black", bg="white", font=("Helvetica", 12))
+    player2.grid(row=5,column=2)
+
+    Draws = Label(tk, text="Draws: %d" %draw, fg="black", bg="white", font=("Helvetica", 12))
+    Draws.grid(row=5,column=3)
+    
+    
 def blackTheme():
     tk.configure(background='black')
-def blueTheme():
-    tk.configure(background='blue')  
+    # ---TOP FRAME---
+    # top label
+    header = Label(tk, text="Tic Tac Toe \n it is " + playersTurn + "s go!", fg="white", bg="black", font=("Helvetica", 12))
+    header.grid(row=0, column=2)
+    # ---BOTTOM FRAME---
+    scoreboard = Label(tk, text="Scoreboard", fg="white", bg="black", font=("Helvetica", 12))
+    scoreboard.grid(row=4, column=2)
 
+    player1 = Label(tk, text="Player1: %d" %p1, fg="white", bg="black", font=("Helvetica", 12))
+    player1.grid(row=5,column=1)
+
+    player2 = Label(tk, text="Player2: %d" %p2, fg="white", bg="black", font=("Helvetica", 12))
+    player2.grid(row=5,column=2)
+
+    Draws = Label(tk, text="Draws: %d" %draw, fg="white", bg="black", font=("Helvetica", 12))
+    Draws.grid(row=5,column=3)
+
+def blueTheme():
+    tk.configure(background='blue')
+    # ---TOP FRAME---
+    # top label
+    header = Label(tk, text="Tic Tac Toe \n it is " + playersTurn + "s go!", fg="Red", bg="blue", font=("Helvetica", 12))
+    header.grid(row=0, column=2)
+
+    # ---BOTTOM FRAME---
+    scoreboard = Label(tk, text="Scoreboard", fg="Red", bg="blue", font=("Helvetica", 12))
+    scoreboard.grid(row=4, column=2)
+
+    player1 = Label(tk, text="Player1: %d" %p1, fg="Red", bg="blue", font=("Helvetica", 12))
+    player1.grid(row=5,column=1)
+
+    player2 = Label(tk, text="Player2: %d" %p2, fg="Red", bg="blue", font=("Helvetica", 12))
+    player2.grid(row=5,column=2)
+
+    Draws = Label(tk, text="Draws: %d" %draw, fg="Red", bg="blue", font=("Helvetica", 12))
+    Draws.grid(row=5,column=3)
+
+# -------------------------------END OF THEMES------------------------------------
+# ------------------------------CREATE BOARD--------------------------------------    
 # Menu bar
 menubar = Menu(tk)
 tk.config(menu=menubar)
@@ -229,6 +276,7 @@ menubar.add_cascade(label="File", menu=submenu)
 submenu.add_command(label="New Game..", command=newgame)
 submenu.add_command(label="Exit", command=tk.destroy)
 
+#----Theme Menu-------
 submenu3 = Menu(menubar)
 menubar.add_cascade(label="Themes", menu=submenu3)
 submenu3.add_command(label="White", command=whiteTheme)
@@ -294,7 +342,6 @@ player2.grid(row=5,column=2)
 
 Draws = Label(tk, text="Draws: %d" %draw, fg="black", bg="white", font=("Helvetica", 12))
 Draws.grid(row=5,column=3)
-
 
 
 # -------------------------------END OF CREATE BOARD------------------------------------
