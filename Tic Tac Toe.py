@@ -7,7 +7,6 @@ draw = 0
 gameTypeAi = False
 turnNumber = 0
 
-
 moves1 = [0,2,6,8]
 moves2 = [4]
 moves3 = [1,3,5,7]
@@ -197,13 +196,28 @@ def newgame():
     moves2 = [4]
     moves3 = [1,3,5,7]
 
+def whiteTheme():
+    tk.configure(background='white')
+def blackTheme():
+    tk.configure(background='black')
+def blueTheme():
+    tk.configure(background='blue')    
+        
+
 # -----------------------------END ALL FUNCTIONS----------------------------------
 # ------------------------------CREATE BOARD--------------------------------------
 
 # Create and configure the layout
 tk = Tk()
 tk.title("Tic Tac Toe")
-tk.configure(background='white')
+
+#Theme Options
+def whiteTheme():
+    tk.configure(background='white')
+def blackTheme():
+    tk.configure(background='black')
+def blueTheme():
+    tk.configure(background='blue')  
 
 # Menu bar
 menubar = Menu(tk)
@@ -215,11 +229,18 @@ menubar.add_cascade(label="File", menu=submenu)
 submenu.add_command(label="New Game..", command=newgame)
 submenu.add_command(label="Exit", command=tk.destroy)
 
+submenu3 = Menu(menubar)
+menubar.add_cascade(label="Themes", menu=submenu3)
+submenu3.add_command(label="White", command=whiteTheme)
+submenu3.add_command(label="Blue", command=blueTheme)
+submenu3.add_command(label="Black", command=blackTheme)
+
 #----Game Type Menu----
 submenu2 = Menu(menubar)
 menubar.add_cascade(label="Game Type", menu=submenu2)
 submenu2.add_command(label="Single Player", command=setSinglePlayer)
 submenu2.add_command(label="Multiplayer", command=setAi)
+
 
 # ---TOP FRAME---
 # top label
