@@ -19,7 +19,7 @@ import sys
 import random
 
 
-# --------------------------------ALL FUNCTIONS-----------------------------------------
+# ---------------------------------ALL FUNCTIONS-----------------------------------------
 def setAi():
     gameTypeAi = True
     global gameTypeAi
