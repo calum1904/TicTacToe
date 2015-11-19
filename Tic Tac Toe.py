@@ -188,7 +188,9 @@ def reset():
     moves3 = [1,3,5,7]
 
 def newgame():
+    global playersTurn, draw, p1, p2, moves1, moves2, moves3
     reset()
+    playersTurn = "X"
     pl = 0
     p2 = 0
     draw = 0
@@ -286,8 +288,8 @@ submenu3.add_command(label="Black", command=blackTheme)
 #----Game Type Menu----
 submenu2 = Menu(menubar)
 menubar.add_cascade(label="Game Type", menu=submenu2)
-submenu2.add_command(label="Single Player", command=setSinglePlayer)
-submenu2.add_command(label="Multiplayer", command=setAi)
+submenu2.add_command(label="Multiplayer", command=setSinglePlayer)
+submenu2.add_command(label="Play against Ai", command=setAi)
 
 
 # ---TOP FRAME---
