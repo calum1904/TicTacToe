@@ -1,33 +1,55 @@
-# Global variables
-playersTurn = "X"
-allbuttons = []
-p1 = 0
-p2 = 0
-draw = 0
-gameTypeAi = False
-turnNumber = 0
-
-moves1 = [0,2,6,8]
-moves2 = [4]
-moves3 = [1,3,5,7]
+# Imports
 
 from tkinter import *
 import tkinter.messagebox
 import os
 import sys
 import random
+import socket
+
+# Global variables
+allbuttons = []
+p1 = 0
+p2 = 0
+draw = 0
+gameTypeAi = True
+turnNumber = 0
+playersTurn = "X"
+
+#Ai moves
+moves1 = [0,2,6,8]
+moves2 = [4]
+moves3 = [1,3,5,7]
+
+#Server Connections
+client = socket.socket()
+port = 12345
+client.connect(('localhost', port))
+
+#Set playersTurn
+playersTurn = client.recv(1024)
+playersTurn = playersTurn.decode('utf-8').rstrip('\r\n')
+print(playersTurn)
 
 
-# ---------------------------------ALL FUNCTIONS-----------------------------------------
+
+
+# --------------------------------ALL FUNCTIONS-----------------------------------------
 def setAi():
     gameTypeAi = True
     global gameTypeAi
     newgame()
 
 def setSinglePlayer():
-    gameTypeAi = False
-    global gameTypeAi
-    newgame()
+   global gameTypeAi, wait 
+   gameTypeAi = False
+   
+   if playersTurn == "O":
+       wait = True
+       makeWait()
+   else:
+        wait = False
+   newgame()
 
 def ai():
     global playersTurn, moves1, moves2, moves3, allbuttons
@@ -63,6 +85,7 @@ def ai():
 
 # Check which players turn it is
 def turnChecker(button):
+    # print("This is the button number: " + str( button ))
     global gameTypeAi, allbuttons, moves1, moves3, moves3
     if allbuttons[button]["text"] == " ":
         allbuttons[button]["text"] = playersTurn
@@ -80,10 +103,31 @@ def turnChecker(button):
             print("User chose " + str(allbuttons[button]))
             print("Moves 3 remaining" + str(moves3))
         checkWinner()
-        changeTurn()
+        move = str(button)
+        client.send( move.encode('utf-8'))
+        waitForOverPlayer()
 
 
-# change turn after every move
+# Once the other player has made there turn the board will update
+def waitForOverPlayer():
+    global gameTypeAi, allbuttons, moves1, moves3, moves3
+    recTurn = client.recv(1024)
+    recTurn = recTurn.decode('utf-8').rstrip('\r\n')
+    print(recTurn)
+    wait = False
+    recTurn = int(recTurn)
+    if playersTurn == "X":
+        if allbuttons[recTurn]["text"] == " ":
+            allbuttons[recTurn]["text"] = "O"
+    else:
+        if allbuttons[recTurn]["text"] == " ":
+            allbuttons[recTurn]["text"] = "X"
+    checkWinner()
+    makeWait()
+
+
+
+#change turn after every move
 def changeTurn():
     global playersTurn
     
@@ -112,7 +156,7 @@ def checkWinner():
 
     global p1, p2, draw
 
-    #Check for horizontal wins
+    # check for horizontal wins
     for x in range(0, 9, 3):
         if (allbuttons[x]["text"] == playersTurn and allbuttons[x + 1]["text"] == playersTurn and
             allbuttons[x + 2]["text"] == playersTurn):
@@ -123,7 +167,7 @@ def checkWinner():
                 
             playAgain(playersTurn)
 
-    #Check for vertical wins
+    # check for vertical wins
     for x in range(0, 3, 1):
         if (allbuttons[x]["text"] == playersTurn and allbuttons[x + 3]["text"] == playersTurn and
             allbuttons[x + 6]["text"] == playersTurn):
@@ -134,7 +178,7 @@ def checkWinner():
                 
             playAgain(playersTurn)
 
-    #Check for diagonal wins    
+    # check for diagonal wins    
     if (allbuttons[0]["text"] == playersTurn and allbuttons[4]["text"] == playersTurn and
         allbuttons[8]["text"] == playersTurn or allbuttons[2]["text"] == playersTurn and
         allbuttons[4]["text"] == playersTurn and allbuttons[6]["text"] == playersTurn):
@@ -145,8 +189,10 @@ def checkWinner():
                 
             playAgain(playersTurn)
 
-    #Check for draw    
+    # check for draw    
     temp = 0
+    #if gameTypeAi == True:
+     #   temp = temp + 1
     for x in range (0,9):
         if (allbuttons[x]["text"] == "X" or allbuttons[x]["text"] == "O"):
             temp = temp+1
@@ -199,15 +245,19 @@ def newgame():
     moves3 = [1,3,5,7]
 
 
+def makeWait():
+    global wait
+    while True:
+        if playersTurn == "O" and wait == True:
+            waitForOverPlayer()
+        else:
+            break
+
 # -----------------------------END ALL FUNCTIONS----------------------------------
-
-# Create and configure the layout
-tk = Tk()
-tk.title("Tic Tac Toe")
-
 # ----------------------------------THEMES-------------------------------------------
 def whiteTheme():
     tk.configure(background='white')
+    
     # ---TOP FRAME---
     # top label
     header = Label(tk, text="Tic Tac Toe \n it is " + playersTurn + "s go!", fg="black", bg="white", font=("Helvetica", 12))
@@ -229,6 +279,7 @@ def whiteTheme():
     
 def blackTheme():
     tk.configure(background='black')
+    
     # ---TOP FRAME---
     # top label
     header = Label(tk, text="Tic Tac Toe \n it is " + playersTurn + "s go!", fg="white", bg="black", font=("Helvetica", 12))
@@ -248,6 +299,7 @@ def blackTheme():
 
 def blueTheme():
     tk.configure(background='blue')
+    
     # ---TOP FRAME---
     # top label
     header = Label(tk, text="Tic Tac Toe \n it is " + playersTurn + "s go!", fg="Red", bg="blue", font=("Helvetica", 12))
@@ -267,7 +319,13 @@ def blueTheme():
     Draws.grid(row=5,column=3)
 
 # -------------------------------END OF THEMES------------------------------------
-# ------------------------------CREATE BOARD--------------------------------------    
+# ------------------------------CREATE BOARD--------------------------------------
+
+# Create and configure the layout
+tk = Tk()
+tk.title("Tic Tac Toe")
+tk.configure(background='white')
+
 # Menu bar
 menubar = Menu(tk)
 tk.config(menu=menubar)
@@ -278,19 +336,18 @@ menubar.add_cascade(label="File", menu=submenu)
 submenu.add_command(label="New Game..", command=newgame)
 submenu.add_command(label="Exit", command=tk.destroy)
 
-#----Theme Menu-------
-submenu3 = Menu(menubar)
-menubar.add_cascade(label="Themes", menu=submenu3)
-submenu3.add_command(label="White", command=whiteTheme)
-submenu3.add_command(label="Blue", command=blueTheme)
-submenu3.add_command(label="Black", command=blackTheme)
-
 #----Game Type Menu----
 submenu2 = Menu(menubar)
 menubar.add_cascade(label="Game Type", menu=submenu2)
 submenu2.add_command(label="Multiplayer", command=setSinglePlayer)
 submenu2.add_command(label="Play against Ai", command=setAi)
 
+#----Theme Menu-------
+submenu3 = Menu(menubar)
+menubar.add_cascade(label="Themes", menu=submenu3)
+submenu3.add_command(label="White", command=whiteTheme)
+submenu3.add_command(label="Blue", command=blueTheme)
+submenu3.add_command(label="Black", command=blackTheme)
 
 # ---TOP FRAME---
 # top label
@@ -326,8 +383,6 @@ for x in range(0, 9):
         columnX = 3
         rowXI = rowChecker()
 
-    #print(x, rowXI, columnX)
-
     button = Button(tk, text=" ", height=7, width=14, command=lambda j=x: turnChecker(j))
     button.grid(row=rowXI, column=columnX)
     allbuttons.append(button)
@@ -346,7 +401,12 @@ Draws = Label(tk, text="Draws: %d" %draw, fg="black", bg="white", font=("Helveti
 Draws.grid(row=5,column=3)
 
 
+
 # -------------------------------END OF CREATE BOARD------------------------------------
+
+
 
 # keep program open until user closes
 tk.mainloop()
+
+
