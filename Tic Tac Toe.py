@@ -62,6 +62,7 @@ def recMove():
     move = client.recv(1024)
     move = move.decode('utf-8').rstrip('\r\n')
     print("The other player click square: " + str(move))
+    print(move)
     move = int(move)
     if allbuttons[move]["text"] == " ":
         allbuttons[move]["text"] = "O"
