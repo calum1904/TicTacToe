@@ -2,6 +2,7 @@
 
 from tkinter import *
 import tkinter.messagebox
+import tkinter.simpledialog as sd 
 import os
 import sys
 import random
@@ -20,16 +21,7 @@ playersTurn = "X"
 moves1 = [0,2,6,8]
 moves2 = [4]
 moves3 = [1,3,5,7]
-
-#Server Connections
-client = socket.socket()
-port = 12345
-client.connect(('localhost', port))
-
-#Set playersTurn
-playersTurn = client.recv(1024)
-playersTurn = playersTurn.decode('utf-8').rstrip('\r\n')
-print(playersTurn)
+ 
 
 
 
@@ -40,16 +32,41 @@ def setAi():
     global gameTypeAi
     newgame()
 
-def setSinglePlayer():
-   global gameTypeAi, wait 
+def setMultiplayer():
+   global gameTypeAi, client
    gameTypeAi = False
-   
-   if playersTurn == "O":
-       wait = True
-       makeWait()
-   else:
-        wait = False
+
+   root = Tk()
+   root.withdraw()
+   root.resizable(0,0)
+
+   ip = str(sd.askstring("IP Address", "Enter the ip address you want to connect to"))
+   port1 = sd.askstring("Port Number", "Enter the port number you want to connect to")
+   if (ip == ""):
+       ip = 'localhost'
+   if (port1 == ""):
+       port1 = 12345
+
+   #Server Connections
+   client = socket.socket()
+   port = int(port1)
+   client.connect((ip, port))
+
+
    newgame()
+   
+
+
+def recMove():
+    global allbuttons
+    move = client.recv(1024)
+    move = move.decode('utf-8').rstrip('\r\n')
+    print("The other player click square: " + str(move))
+    move = int(move)
+    if allbuttons[move]["text"] == " ":
+        allbuttons[move]["text"] = "O"
+    checkWinner()
+
 
 def ai():
     global playersTurn, moves1, moves2, moves3, allbuttons
@@ -86,7 +103,7 @@ def ai():
 # Check which players turn it is
 def turnChecker(button):
     # print("This is the button number: " + str( button ))
-    global gameTypeAi, allbuttons, moves1, moves3, moves3
+    global gameTypeAi, allbuttons, moves1, moves3, moves3, client
     if allbuttons[button]["text"] == " ":
         allbuttons[button]["text"] = playersTurn
         print (button)
@@ -102,29 +119,10 @@ def turnChecker(button):
             moves3.remove(button)
             print("User chose " + str(allbuttons[button]))
             print("Moves 3 remaining" + str(moves3))
-        checkWinner()
         move = str(button)
         client.send( move.encode('utf-8'))
-        waitForOverPlayer()
-
-
-# Once the other player has made there turn the board will update
-def waitForOverPlayer():
-    global gameTypeAi, allbuttons, moves1, moves3, moves3
-    recTurn = client.recv(1024)
-    recTurn = recTurn.decode('utf-8').rstrip('\r\n')
-    print(recTurn)
-    wait = False
-    recTurn = int(recTurn)
-    if playersTurn == "X":
-        if allbuttons[recTurn]["text"] == " ":
-            allbuttons[recTurn]["text"] = "O"
-    else:
-        if allbuttons[recTurn]["text"] == " ":
-            allbuttons[recTurn]["text"] = "X"
-    checkWinner()
-    makeWait()
-
+        checkWinner()
+        recMove()
 
 
 #change turn after every move
@@ -245,13 +243,28 @@ def newgame():
     moves3 = [1,3,5,7]
 
 
-def makeWait():
-    global wait
-    while True:
-        if playersTurn == "O" and wait == True:
-            waitForOverPlayer()
-        else:
-            break
+def instruction():
+    tkinter.messagebox.showinfo("Tic-Tac-Toe Instruction",
+                                "X always goes first.\n\n"+
+                                "Players alternate placing Xs and Os on the board until either (a) one player has three in a row\n\n"+
+                                "horizontally, vertically or diagonally; or (b) all nine squares are filled.\n\n"+
+                                "If a player is able to draw three Xs or three Os in a row, that player wins.\n\n"+
+                                "If all nine squares are filled and neither player has three in a row, the game is a draw.")  
+
+def About():
+    tkinter.messagebox.showinfo("About",
+                                "This game was developed by the following people.\n\n"+
+                                "Calum Chamberlain\n\n"+
+                                "Salman Fazal\n\n"+
+                                "Prince Agyei Frimpong\n\n"+
+                                "Sayed Askor Ali\n\n"+
+                                "Muhammed Saqab\n\n"+
+                                "Khadiza Yesmin\n\n"+
+                                "This game was developed using Python version 3.4.3\n"+
+                                "Copyright (c) 2015\n"+
+                                "All Rights Reserved")
+
+    tk.mainloop()
 
 # -----------------------------END ALL FUNCTIONS----------------------------------
 # ----------------------------------THEMES-------------------------------------------
@@ -339,7 +352,7 @@ submenu.add_command(label="Exit", command=tk.destroy)
 #----Game Type Menu----
 submenu2 = Menu(menubar)
 menubar.add_cascade(label="Game Type", menu=submenu2)
-submenu2.add_command(label="Multiplayer", command=setSinglePlayer)
+submenu2.add_command(label="Multiplayer", command=setMultiplayer)
 submenu2.add_command(label="Play against Ai", command=setAi)
 
 #----Theme Menu-------
@@ -348,6 +361,12 @@ menubar.add_cascade(label="Themes", menu=submenu3)
 submenu3.add_command(label="White", command=whiteTheme)
 submenu3.add_command(label="Blue", command=blueTheme)
 submenu3.add_command(label="Black", command=blackTheme)
+
+#----Help Menu-------
+submenu4 = Menu(menubar)
+menubar.add_cascade(label="Help", menu=submenu4)
+submenu4.add_command(label="Instruction", command=instruction)
+submenu4.add_command(label="About", command=About)
 
 # ---TOP FRAME---
 # top label
@@ -408,5 +427,3 @@ Draws.grid(row=5,column=3)
 
 # keep program open until user closes
 tk.mainloop()
-
-
