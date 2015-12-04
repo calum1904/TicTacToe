@@ -1,6 +1,6 @@
 #!/usr/bin/python3          
 import socket, select         # Import socket module
-
+import time
 class TicTacToe:
 	def __init__(self, port=12345):
 		self.connections = []                 # List of connections
@@ -51,13 +51,15 @@ class TicTacToe:
 #--------------------------------------------------------------------------Start the server---------------------------------------------------------------------------------
 
 print("INFO:: Starting Tic Tac Toe Server")
+print("INFO:: The Servers ip is " + socket.gethostbyname(socket.gethostname()))
+print("INFO:: Binding to port: 12345\n")
 time.sleep(1)
 print("INFO:: Server ready for clients to connect")
 
 
 if __name__ == '__main__':
 	try:
-		c = Chat()
+		c = TicTacToe()
 		while True:
 			c.poll()
 	except KeyboardInterrupt:
