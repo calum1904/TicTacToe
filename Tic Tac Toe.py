@@ -130,7 +130,7 @@ def turnChecker(button):
     global gameTypeAi, allbuttons, moves1, moves3, moves3, client, playersTurn
     if allbuttons[button]["text"] == " ":
         allbuttons[button]["text"] = playersTurn
-        print ("You clicked square " + button)
+        print ("You clicked square " + str(button))
         if button in moves1 and gameTypeAi == True:
             moves1.remove(button)
             print("Moves 1 remaining" + str(moves1))
