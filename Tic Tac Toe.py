@@ -147,6 +147,7 @@ def turnChecker(button):
             checkWinner(playersTurn)
             recMove()
         else:
+            checkWinner(playersTurn)
             changeTurn()
 
 
