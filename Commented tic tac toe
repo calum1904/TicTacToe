@@ -1,0 +1,474 @@
+# --------------------------------IMPORTS & VARIABLES---------------------------------
+
+
+# Imports
+from tkinter import *
+import tkinter.messagebox
+import tkinter.simpledialog as sd 
+import os
+import sys
+import random
+import socket
+
+# Global variables
+allbuttons = []
+p1 = 0
+p2 = 0
+draw = 0
+gameTypeAi = True
+turnNumber = 0
+playersTurn = "X"
+oppositePlayer = "O"
+receivedMoves = []
+
+#Ai moves strategy
+moves1 = [0,2,6,8]
+moves2 = [4]
+moves3 = [1,3,5,7]
+
+# -----------------------------END OF IMPORTS & VARIABLES-------------------------------
+ 
+
+# --------------------------------ALL FUNCTIONS-----------------------------------------
+
+def setAi():
+
+    global gameTypeAi   # Global variable called for use in this function
+    gameTypeAi = True   # Set to True to enable singleplayer
+    newgame()           # Reset board
+
+def setMultiplayer():
+
+   global gameTypeAi, client, playersTurn, oppositePlayer   # Global variable called for use in this function
+   gameTypeAi = False   # Set to False to disable singleplayer
+
+   root = Tk()  # Create board
+   root.withdraw()  # Make board visible
+
+   # Ask the user for an ip address and a port, default values if blank = 'localhost' and '12345'
+   ip = str(sd.askstring("IP Address", "Enter the ip address you want to connect to"))  # Dialog box to ask for  IP
+   port1 = sd.askstring("Port Number", "Enter the port number you want to connect to")  # Dialog box to ask for Port
+   if (ip == ""):
+       ip = 'localhost' # Value if left blank
+   if (port1 == ""):
+       port1 = 12345    # Value if left blank
+
+   #Server Connections
+   client = socket.socket()
+   port = int(port1)
+   client.connect((ip, port))
+   #Receive a message from the server defining which player you are 'X' or 'O'
+   assign = client.recv(1024)
+   assign = assign.decode('utf-8').rstrip('\r\n')
+   if assign == "X":
+       playersTurn = "X"
+       oppositePlayer = "O"
+   elif assign == "O":
+       playersTurn = "O"
+       oppositePlayer = "X"
+
+   print("You are player " + playersTurn)   # 
+   header.configure(text="Tic Tac Toe\nYou are player " + playersTurn)  # Print this to the header
+
+   if playersTurn == "O":
+       recMove()    # You are 'X', when in multiplayer, go to this function to receive opponent move
+   
+   
+
+
+def recMove():
+
+    global allbuttons, playersTurn, receivedMoves   # Global variable called for use in this function
+    #Receive the move and decode it
+    move = client.recv(1024)
+    move = move.decode('utf-8').rstrip('\r\n')
+    
+    print("The other player click square: " + str(move))
+    #Convert the move to a int and add it to a list of received moves
+    move = int(move)
+    receivedMoves.append(move)
+
+    #Go through the list and change any squares that have been clicked by the opponent by checking the received moves
+    for moves in receivedMoves:
+        if playersTurn == "X":
+            if allbuttons[moves]["text"] == " ":
+                allbuttons[moves]["text"] = "O"
+                checkWinner(oppositePlayer)
+        elif playersTurn == "O":
+            if allbuttons[moves]["text"] == " ":
+                allbuttons[moves]["text"] = "X"
+                checkWinner(oppositePlayer)
+    
+
+
+def ai():
+
+    global playersTurn, moves1, moves2, moves3, allbuttons   # Global variable called for use in this function
+
+    # Strategy
+    if moves1 != []:    # If moves1 is not empty, do the following:
+        for x in range(4):
+            corners = random.choice(moves1) # Choose any value from the 4 available
+            if allbuttons[corners]["text"] == " ":  # If the value chosen is not played yet,
+                allbuttons[corners]["text"] = playersTurn   # Set it to the random value chosen
+                moves1.remove(corners)  # Remove the value chosen from the array
+                print("Ai chose " + str(corners))
+                print("remaining" + str(moves1))
+                break   # Stop the for loop if already played
+    elif moves2 != []:   # If moves2 is not empty, do the following:
+            if allbuttons[4]["text"] == " ": # Check if the centre is not played yet
+                allbuttons[4]["text"] = playersTurn # If centre not played, play it.
+                moves2.remove(4)    # Remove the value from the array
+                print("Ai chose " + "5")
+                print("remaining" + str(moves2))
+            
+    elif moves3 != []:    # If moves3 is not empty, do the following:
+        for x in range(4):
+            everythingElse = random.choice(moves3)  # Choose any value from the 4 available
+            if allbuttons[everythingElse]["text"] == " ":  # If the value chosen is not played yet,
+                allbuttons[everythingElse]["text"] = playersTurn   # Set it to the random value chosen
+                moves3.remove(everythingElse)  # Remove the value chosen from the array
+                print("Ai chose " + str(everythingElse))
+                print("remaining" + str(moves3))  
+                break   # Stop the for loop if already played
+    
+    changeTurn()    # Change turn
+    checkWinner(playersTurn)    # Check for wins or draw
+
+
+# Function called when button is clicked
+def btnClicked(button):
+    
+    global gameTypeAi, allbuttons, moves1, moves3, moves3, client, playersTurn   # Global variable called for use in this function
+    
+    if allbuttons[button]["text"] == " ":   # If button clicked is empty
+        allbuttons[button]["text"] = playersTurn    # Set it to current players turn
+        print ("You clicked square " + str(button))
+        
+        if button in moves1 and gameTypeAi == True:
+            moves1.remove(button)                   # If in singleplayer mode, remove the button clicked from the array
+            print("Moves 1 remaining" + str(moves1))
+        if button in moves2 and gameTypeAi == True:
+            moves2.remove(button)
+            print("Moves 2 remaining" + str(moves2))
+        if button in moves3 and gameTypeAi == True:
+            moves3.remove(button)
+            print("Moves 3 remaining" + str(moves3))
+        
+        #If you're playing against someone then take the move, encode and send it to the server, then wait by going to the recMove function
+        if gameTypeAi == False: 
+            move = str(button)
+            client.send( move.encode('utf-8'))
+            checkWinner(playersTurn)
+            recMove()
+        else:
+            checkWinner(playersTurn)
+            changeTurn()
+
+
+#change turn after every move
+def changeTurn():
+
+    global playersTurn   # Global variable called for use in this function
+    
+    #Do this if singleplayer mode is enable
+    if gameTypeAi == True:
+        if playersTurn == "O":
+            playersTurn = "X"  # If current turn is O, change to X
+        else:
+            playersTurn = "O"
+            ai()      # If current turn is X, change to O and call function for ai to play
+
+    header.configure(text="Tic Tac Toe \n it is " + playersTurn + "s go!")  # Print this to the header
+
+
+# Check for wins or draws
+def checkWinner(player):
+
+    global p1, p2, draw, playersTurn   # Global variables called for use in this function
+
+        
+    # Check for horizontal wins
+    for x in range(0, 9, 3):    # Skip 3 buttons (ie. 0,3,6 / 1,4,7 / 2,5,8)
+        if (allbuttons[x]["text"] == player and allbuttons[x + 1]["text"] == player and
+            allbuttons[x + 2]["text"] == player):   # If same value 3 in a row:
+            if player == "X":
+                p1 = p1+1   # Increment wins for player 1
+            else:
+                p2 = p2+1   # Increment wins for player 2
+                
+            playAgain(player)   # Ask if user wants to play again
+
+    # Check for vertical wins
+    for x in range(0, 3, 1):
+        if (allbuttons[x]["text"] == player and allbuttons[x + 3]["text"] == player and
+            allbuttons[x + 6]["text"] == player):   #If same value 3 in a row
+            if player == "X":
+                p1 = p1+1   # Increment wins for player 1
+            else:
+                p2 = p2+1   # Increment wins for player 2
+                
+            playAgain(player)   # Ask if user wants to play again
+
+    # Check for diagonal wins    
+    if (allbuttons[0]["text"] == player and allbuttons[4]["text"] == player and
+        allbuttons[8]["text"] == player or allbuttons[2]["text"] == player and
+        allbuttons[4]["text"] == player and allbuttons[6]["text"] == player):
+            if player == "X":
+                p1 = p1+1   # Increment wins for player 1
+            else:
+                p2 = p2+1   # Increment wins for player 2
+                
+            playAgain(player)   # Ask if user wants to play again
+
+    # Check for draw
+    # If all buttons have a value and nobody won then it's a draw
+    temp = 0    # Temporary variable
+    for x in range (0,9):
+        if (allbuttons[x]["text"] == "X" or allbuttons[x]["text"] == "O"):
+            temp = temp+1   # Increment temp for every button which has a value
+        if temp == 9:   # If temp is 9 (all buttons are filled up):
+            draw = draw + 1  # Increment draws
+            playAgain("Draw")   # Ask if user wants to play again
+
+
+
+# Function to ask if user wants to play a new game
+def playAgain(winner):
+    if winner == "X" or winner == "O":  # Do this if there is a winner:
+        playAgainX = tkinter.messagebox.askyesno("WINNER", 
+            "The winner is %s \n Would you like to play again?" % winner)   # Question box with message saying who won
+        if playAgainX is True:
+            reset()     # If user selects yes, reset board.
+        elif playAgainX is False:
+            tk.destroy()    # If user selects no, quit game.
+    
+    elif winner == "Draw":  # Do this if the game went draw
+        playAgainX = tkinter.messagebox.askyesno("Draw", 
+            "The game was a Draw \n Would you like to play again?") # Question box with message saying its a draw
+        if playAgainX is True:
+            reset()     # If user selects yes, reset board.
+        elif playAgainX is False:
+            tk.destroy()    # If user selects no, quit game.
+
+
+# Reset board for new game but same scoreboard
+def reset():
+    global playersTurn, gameTypeAi, moves1, moves2, moves3, receivedMoves   # Global variables called for use in this function
+    receivedMoves = []  # Clear everything in the array
+    for x in range(0, 9):
+        player1.configure(text="Player 1: %d" %p1)  # Update the scoreboard 
+        player2.configure(text="Player 2: %d" %p2)
+        Draws.configure(text="Draws: %d" %draw)
+        allbuttons[x]["text"] = " "     # Set all buttons to no value
+    print (playersTurn)
+    if gameTypeAi is True and playersTurn == "O":
+        ai()    # If game in singleplayer mode, and its ai's turn, let it start
+    moves1 = [0,2,6,8]  # Reset all values in the moves arrays
+    moves2 = [4]
+    moves3 = [1,3,5,7]
+
+# Reset EVERYTHING
+def newgame():
+    global playersTurn, draw, p1, p2, moves1, moves2, moves3   # Global variables called for use in this function
+    reset()
+    playersTurn = "X"           # Reset scoreboard, moves array and set players turn to X
+    pl = 0
+    p2 = 0
+    draw = 0
+    moves1 = [0,2,6,8]
+    moves2 = [4]
+    moves3 = [1,3,5,7]
+
+
+# Pop-up message box when user clicks instruction in menu bar
+def instruction():
+    tkinter.messagebox.showinfo("Tic-Tac-Toe Instruction",
+                                "X always goes first.\n\n"+
+                                "Players alternate placing Xs and Os on the board until either (a) one player has three in a row\n\n"+
+                                "horizontally, vertically or diagonally; or (b) all nine squares are filled.\n\n"+
+                                "If a player is able to draw three Xs or three Os in a row, that player wins.\n\n"+
+                                "If all nine squares are filled and neither player has three in a row, the game is a draw.")  
+
+# Pop-up message box when user clicks about in menu bar
+def About():
+    tkinter.messagebox.showinfo("About",
+                                "This game was developed by the following people:\n\n"+
+                                "           - Calum Chamberlain\n\n"+
+                                "           - Salman Fazal\n\n"+
+                                "           - Prince Agyei Frimpong\n\n"+
+                                "           - Sayed Askor Ali\n\n"+
+                                "           - Muhammed Saqab\n\n"+
+                                "           - Khadiza Yesmin\n\n"+
+                                "This game was developed using Python version 3.4.3\n"+
+                                "Copyright (c) 2015\n"+
+                                "All Rights Reserved")
+
+    tk.mainloop()   # Keep gui open and running
+
+
+# ------------THEMES-------------
+def whiteTheme():
+    tk.configure(background='white')
+    
+    # ---TOP FRAME---
+    # top label
+    header = Label(tk, text="Tic Tac Toe \n it is " + playersTurn + "s go!", fg="black", bg="white", font=("Helvetica", 12))
+    header.grid(row=0, column=2)
+
+    # ---BOTTOM FRAME---
+    scoreboard = Label(tk, text="Scoreboard", fg="black", bg="white", font=("Helvetica", 12))
+    scoreboard.grid(row=4, column=2)
+
+    player1 = Label(tk, text="Player1: %d" %p1, fg="black", bg="white", font=("Helvetica", 12))
+    player1.grid(row=5,column=1)
+
+    player2 = Label(tk, text="Player2: %d" %p2, fg="black", bg="white", font=("Helvetica", 12))
+    player2.grid(row=5,column=2)
+
+    Draws = Label(tk, text="Draws: %d" %draw, fg="black", bg="white", font=("Helvetica", 12))
+    Draws.grid(row=5,column=3)
+    
+    
+def blackTheme():
+    tk.configure(background='black')
+    
+    # ---TOP FRAME---
+    # top label
+    header = Label(tk, text="Tic Tac Toe \n it is " + playersTurn + "s go!", fg="white", bg="black", font=("Helvetica", 12))
+    header.grid(row=0, column=2)
+    # ---BOTTOM FRAME---
+    scoreboard = Label(tk, text="Scoreboard", fg="white", bg="black", font=("Helvetica", 12))
+    scoreboard.grid(row=4, column=2)
+
+    player1 = Label(tk, text="Player1: %d" %p1, fg="white", bg="black", font=("Helvetica", 12))
+    player1.grid(row=5,column=1)
+
+    player2 = Label(tk, text="Player2: %d" %p2, fg="white", bg="black", font=("Helvetica", 12))
+    player2.grid(row=5,column=2)
+
+    Draws = Label(tk, text="Draws: %d" %draw, fg="white", bg="black", font=("Helvetica", 12))
+    Draws.grid(row=5,column=3)
+
+def blueTheme():
+    tk.configure(background='blue')
+    
+    # ---TOP FRAME---
+    # top label
+    header = Label(tk, text="Tic Tac Toe \n it is " + playersTurn + "s go!", fg="Red", bg="blue", font=("Helvetica", 12))
+    header.grid(row=0, column=2)
+
+    # ---BOTTOM FRAME---
+    scoreboard = Label(tk, text="Scoreboard", fg="Red", bg="blue", font=("Helvetica", 12))
+    scoreboard.grid(row=4, column=2)
+
+    player1 = Label(tk, text="Player1: %d" %p1, fg="Red", bg="blue", font=("Helvetica", 12))
+    player1.grid(row=5,column=1)
+
+    player2 = Label(tk, text="Player2: %d" %p2, fg="Red", bg="blue", font=("Helvetica", 12))
+    player2.grid(row=5,column=2)
+
+    Draws = Label(tk, text="Draws: %d" %draw, fg="Red", bg="blue", font=("Helvetica", 12))
+    Draws.grid(row=5,column=3)
+
+# ----------END OF THEMES------------
+
+# -----------------------------END ALL FUNCTIONS----------------------------------
+
+
+
+# ------------------------------CREATE BOARD--------------------------------------
+
+# Create and configure the layout
+tk = Tk()   # GUI from tkinter package
+tk.title("Tic Tac Toe") # Board title
+tk.configure(background='white')    # Board Background
+
+#----------Menu bar----------
+menubar = Menu(tk)  # Call Menu function from tkinter
+tk.config(menu=menubar) # Add menubar to the board
+
+# File Menu
+submenu = Menu(menubar) # Submenu 1
+menubar.add_cascade(label="File", menu=submenu) # Name first menu in the menubar
+submenu.add_command(label="New Game..", command=newgame)    # Submenu under the first menu
+submenu.add_command(label="Exit", command=tk.destroy)   # Second submenu
+
+# Game Type Menu
+submenu2 = Menu(menubar)
+menubar.add_cascade(label="Game Type", menu=submenu2)
+submenu2.add_command(label="Multiplayer", command=setMultiplayer)
+submenu2.add_command(label="Play against Ai", command=setAi)
+
+# Theme Menu
+submenu3 = Menu(menubar)
+menubar.add_cascade(label="Themes", menu=submenu3)
+submenu3.add_command(label="White", command=whiteTheme)
+submenu3.add_command(label="Blue", command=blueTheme)
+submenu3.add_command(label="Black", command=blackTheme)
+
+# Help Menu
+submenu4 = Menu(menubar)
+menubar.add_cascade(label="Help", menu=submenu4)
+submenu4.add_command(label="Instruction", command=instruction)
+submenu4.add_command(label="About", command=About)
+
+#--------End of Menu bar--------
+
+# ----------TOP FRAME--------
+# top label
+header = Label(tk, text="Tic Tac Toe \n it is " + playersTurn + "s go!", 
+    fg="black", bg="white", font=("Helvetica", 12))     #Add header text with these qualities
+header.grid(row=0, column=2)    # Position of the header text
+
+
+# ---MIDDLE FRAME---
+# This function is used to check wich row each box needs to go in
+# Example the first if says if the button is 0, 1 or 2 they need to be in the top row(1)
+def rowChecker():
+    buttonRow = 1
+    if square == 0 or square == 1 or square == 2:
+        buttonRow = 1
+    elif square == 3 or square == 4 or square == 5:
+        buttonRow = 2
+    elif square == 6 or square == 7 or square == 8:
+        buttonRow = 3
+    return buttonRow
+
+
+# This creates the board and the buttons and runs the game
+for square in range(0, 9):
+    button = "button" + str(square)
+    if square == 0 or square == 3 or square == 6:
+        buttonColumn = 1
+        buttonRowX = rowChecker()
+    elif square == 1 or square == 4 or square == 7:
+        buttonColumn = 2
+        buttonRowX = rowChecker()
+    elif square == 2 or square == 5 or square == 8:
+        buttonColumn = 3
+        buttonRowX = rowChecker()
+
+    # Place buttons on the board and call btnClicked() each time a button is clicked
+    button = Button(tk, text=" ", height=7, width=14, command=lambda j=square: btnClicked(j)) 
+    button.grid(row=buttonRowX, column=buttonColumn)
+    allbuttons.append(button)   # Add the buttons to the array
+
+# ---BOTTOM FRAME---
+scoreboard = Label(tk, text="Scoreboard", fg="black", bg="white", font=("Helvetica", 12))
+scoreboard.grid(row=4, column=2)
+
+player1 = Label(tk, text="Player1: %d" %p1, fg="black", bg="white", font=("Helvetica", 12))
+player1.grid(row=5,column=1)
+
+player2 = Label(tk, text="Player2: %d" %p2, fg="black", bg="white", font=("Helvetica", 12))
+player2.grid(row=5,column=2)
+
+Draws = Label(tk, text="Draws: %d" %draw, fg="black", bg="white", font=("Helvetica", 12))
+Draws.grid(row=5,column=3)
+
+
+# -------------------------------END OF CREATE BOARD------------------------------------
+
+# keep program open and running
+tk.mainloop()
